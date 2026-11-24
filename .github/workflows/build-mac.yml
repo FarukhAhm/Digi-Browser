@@ -1,0 +1,57 @@
+name: Build Digi Browser for macOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build macOS App (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x86_64
+            runner: macos-15-intel
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build Digi Browser
+        run: |
+          pyinstaller \
+            --noconfirm \
+            --clean \
+            --windowed \
+            --onedir \
+            --name "Digi Browser" \
+            --osx-bundle-identifier com.digi.browser \
+            --hidden-import=pynput.keyboard \
+            --collect-submodules=pynput \
+            main.py
+
+      - name: Verify app bundle
+        run: |
+          test -d "dist/Digi Browser.app"
+          echo "Digi Browser.app created successfully"
+
+      - name: Upload macOS App
+        uses: actions/upload-artifact@v4
+        with:
+          name: Digi-Browser-macOS-${{ matrix.arch }}
+          path: dist/Digi Browser.app
+          if-no-files-found: error
