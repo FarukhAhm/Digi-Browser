@@ -1,0 +1,23 @@
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Browser personal data
+browser_data/
+history.json
+bookmarks.json
+
+# Build files
+build/
+dist/
+*.spec
+
+# Secrets
+.env
+.env.*
+*.key
+
+# IDE
+.vscode/
